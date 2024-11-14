@@ -16,6 +16,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage: storage});
 
+router.post('/create/category', upload.single("image"), async (req, res) => {
+    try {
+      let data = new CategoryModel({ ...req.body, image: req.file.originalname });
+      await data.save();
+  
+      res.status(201).json({ message: "Category created successfully" });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({message: 'Internal Server error'});
+    }
+  });
+
 /* GET home page. */
 router.get('/category',  async(req, res, next) => {
   try {
@@ -39,6 +51,18 @@ router.get('/category/:id', async(req, res)=>{
       res.status(500).json({ message:"Internal Server Error", error });
   }
 })
+
+router.post('/create/cuisine', upload.single("image"), async (req, res) => {
+    try {
+      let data = new CuisineModel({ ...req.body, image: req.file.originalname });
+      await data.save();
+  
+      res.status(201).json({ message: "Cuisine created successfully" });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({message: 'Internal Server error'});
+    }
+  });
 
 router.get('/cuisine',  async(req, res, next) => {
   try {
