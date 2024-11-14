@@ -7,7 +7,7 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, path.join(__dirname, "../public/images/"));
+        callback(null, path.join(__dirname, "../public/images"));
     },
     filename: (req,file,callback) => {
         callback(null, file.originalname);
@@ -29,15 +29,23 @@ router.post('/create/category', upload.single("image"), async (req, res) => {
   });
 
 /* GET home page. */
-router.get('/category',  async(req, res, next) => {
-  try {
-    let data = await CategoryModel.find({}).sort({ title: 1 });
-    res.status(200).json({ data: data, count: data.length });        
-} catch (error) {
-    console.log(error);
-    res.status(500).json({ message:"Internal Server Error", error });  
-}
-});
+router.get('/category', async (req, res, next) => {
+    try {
+      let data = await CategoryModel.find({}).sort({ title: 1 });
+  
+      // Map data to include full image URL
+      const baseUrl = `${req.protocol}://${req.get('host')}/images/`;
+      const categories = data.map((category) => ({
+        ...category.toObject(),
+        image: category.image ? `${baseUrl}${category.image}` : null,
+      }));
+  
+      res.status(200).json({ data: categories, count: categories.length });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Internal Server Error", error });
+    }
+  });
 
 router.get('/category/:id', async(req, res)=>{
   try {
